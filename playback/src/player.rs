@@ -1387,9 +1387,12 @@ impl Future for PlayerInternal {
                 }
             }
 
-            if (!self.state.is_playing()) && all_futures_completed_or_not_ready {
-                return Poll::Pending;
+            if self.state.is_playing() || !all_futures_completed_or_not_ready {
+                // allow runtime event loop to work before calling us again.
+                cx.waker().wake_by_ref();
             }
+
+            return Poll::Pending;
         }
     }
 }
