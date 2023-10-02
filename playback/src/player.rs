@@ -501,6 +501,7 @@ impl Player {
     }
 
     fn command(&self, cmd: PlayerCommand) {
+        debug!("sending command {:?}", cmd);
         if let Some(commands) = self.commands.as_ref() {
             if let Err(e) = commands.send(cmd) {
                 error!("Player Commands Error: {}", e);
@@ -1164,6 +1165,7 @@ impl Future for PlayerInternal {
             let cmd = match self.commands.poll_recv(cx) {
                 Poll::Ready(None) => return Poll::Ready(()), // client has disconnected - shut down.
                 Poll::Ready(Some(cmd)) => {
+                    debug!("received command {:?}", cmd);
                     all_futures_completed_or_not_ready = false;
                     Some(cmd)
                 }
